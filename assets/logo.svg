@@ -1,35 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Shalini Singh emblem — Lady Liberty holding the scales of justice">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#12294D"/><stop offset="1" stop-color="#0C1E3B"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Statue of Liberty holding the scales of justice">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12294D"/><stop offset="1" stop-color="#0C1E3B"/></linearGradient></defs>
   <circle cx="50" cy="50" r="49" fill="url(#bg)"/>
   <circle cx="50" cy="50" r="45.5" fill="none" stroke="#7C2A3B" stroke-width="2"/>
-  <g fill="#EFEBE2">
-    <path d="M45.7 30.7 L38.0 30.0 L45.7 29.3 Z"/><path d="M45.9 28.4 L39.6 24.0 L46.6 27.2 Z"/><path d="M47.2 26.6 L44.0 19.6 L48.4 25.9 Z"/><path d="M49.3 25.7 L50.0 18.0 L50.7 25.7 Z"/><path d="M51.6 25.9 L56.0 19.6 L52.8 26.6 Z"/><path d="M53.4 27.2 L60.4 24.0 L54.1 28.4 Z"/><path d="M54.3 29.3 L62.0 30.0 L54.3 30.7 Z"/>
-    <circle cx="50" cy="30" r="4.4"/>
-    <!-- robe / gown -->
-    <path d="M50 34
-             C45 34 43 37 42 41
-             L34 78 Q50 83 66 78 L58 41
-             C57 37 55 34 50 34 Z"/>
-    <!-- drapery lines -->
-    <g stroke="#12294D" stroke-width="0.8" fill="none" opacity="0.5">
-      <path d="M50 40 L50 78"/><path d="M44 44 L40 77"/><path d="M56 44 L60 77"/>
-    </g>
+
+  <!-- ===== Statue of Liberty (left, golden-split composition) ===== -->
+  <g fill="#F0ECE3">
+    <path d="M26.7 28.3 L19.7 23.5 L27.4 27.2 Z"/><path d="M27.6 26.9 L22.6 20.0 L28.6 26.1 Z"/><path d="M28.8 25.9 L26.6 17.8 L30.0 25.5 Z"/><path d="M30.4 25.4 L31.0 17.0 L31.6 25.4 Z"/><path d="M32.0 25.5 L35.4 17.8 L33.2 25.9 Z"/><path d="M33.4 26.1 L39.4 20.0 L34.4 26.9 Z"/><path d="M34.6 27.2 L42.3 23.5 L35.3 28.3 Z"/>
+    <circle cx="31" cy="30" r="4.6"/>
+    <!-- gown -->
+    <path d="M31 34 C27 34 25.5 37 25 41 L20 84 Q31 88 42 84 L37 41 C36.5 37 35 34 31 34 Z"/>
+    <!-- lowered left arm + tablet -->
+    <path d="M26 42 C23 46 22 52 22.5 58 L26 57 C25.7 51 26.5 47 29 44 Z"/>
+    <rect x="16.5" y="55.5" width="9" height="12" rx="1" transform="rotate(-12 21 61)"/>
+    <!-- raised right arm reaching to the scale (up-right) -->
+    <path d="M35 40 C44 35 52 30 58.5 25.5 L60.5 28.5 C54 33 46 38 38 43 Z"/>
   </g>
-  <!-- arms holding the beam at center -->
-  <g stroke="#EFEBE2" stroke-width="3" fill="none" stroke-linecap="round">
-    <path d="M44 43 L50 49"/><path d="M56 43 L50 49"/>
+  <g fill="none" stroke="#C9C3B4" stroke-width="0.7" opacity="0.55">
+    <path d="M31 40 L31 84"/><path d="M26 46 L23 82"/><path d="M35 46 L38 82"/>
   </g>
-  <!-- balance / scales -->
-  <g stroke="#EFEBE2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M50 44 L50 50"/>
-    <path d="M31 46 L69 46"/>
-    <path d="M31 46 L26 55 M31 46 L36 55"/>
-    <path d="M24 55 A7 7 0 0 0 38 55 Z" fill="#0C1E3B"/>
-    <path d="M69 46 L64 55 M69 46 L74 55"/>
-    <path d="M62 55 A7 7 0 0 0 76 55 Z" fill="#0C1E3B"/>
+
+  <!-- ===== balance held aloft on the RIGHT (pivot ~ x=61.8, golden point) ===== -->
+  <g stroke="#F0ECE3" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M59 24 L62 27"/>
+    <path d="M62 27 L62 33"/>
+    <path d="M49 31 L79 31"/>
+    <path d="M49 31 L45 39 M49 31 L53 39"/>
+    <path d="M43 39 A6.5 6.5 0 0 0 55 39 Z" fill="#0C1E3B"/>
+    <path d="M79 31 L75 39 M79 31 L83 39"/>
+    <path d="M73 39 A6.5 6.5 0 0 0 85 39 Z" fill="#0C1E3B"/>
   </g>
 </svg>
