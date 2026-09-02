@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Personal · Shalini Singh</title>
+  <link rel="icon" href="assets/avatar.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand"><span class="mark">SS</span><a href="index.html">Shalini Singh</a></div>
+      <nav class="nav">
+        <a href="index.html">View public site ↗</a>
+        <a class="btn-admin" href="#" id="signout" style="display:none">Sign out</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Sign-in gate -->
+  <div class="admin-wrap gate" id="gate">
+    <div class="panel">
+      <h2>Personal login</h2>
+      <p class="hint">Enter a GitHub <strong>fine-grained personal access token</strong> with <em>Contents: Read &amp; write</em> permission on this repository. It is kept only in this browser tab (session storage) and is <strong>never</strong> committed or uploaded.</p>
+      <label for="tok">GitHub token</label>
+      <input type="password" id="tok" placeholder="github_pat_..." autocomplete="off" />
+      <div style="margin-top:16px" class="row-actions">
+        <button class="btn" id="login">Unlock editor</button>
+        <a class="btn secondary" href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Create a token ↗</a>
+      </div>
+      <div class="callout" style="margin-top:18px">
+        Anything you publish here goes into a <strong>public</strong> repository, so all uploaded documents and posts are publicly viewable. This login protects <em>editing</em>, not the content itself.
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor -->
+  <div class="admin-wrap" id="app" style="display:none">
+    <div class="tab-bar" id="tabs">
+      <button class="tab active" data-tab="profile">Profile</button>
+      <button class="tab" data-tab="sections">Sections</button>
+      <button class="tab" data-tab="posts">Posts</button>
+      <button class="tab" data-tab="media">Documents &amp; Media</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </div>
+
+    <div class="tabpane active" id="pane-profile"></div>
+    <div class="tabpane" id="pane-sections"></div>
+    <div class="tabpane" id="pane-posts"></div>
+    <div class="tabpane" id="pane-media"></div>
+    <div class="tabpane" id="pane-settings"></div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

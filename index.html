@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shalini Singh — Advocate & Legal Educator</title>
+  <meta name="description" content="Shalini Singh — Advocate at the Patna High Court and Assistant Professor of Law. Constitutional law, jurisprudence, and legal education." />
+  <link rel="icon" href="assets/avatar.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">
+        <span class="mark">SS</span>
+        <a href="index.html">Shalini Singh</a>
+      </div>
+      <nav class="nav">
+        <a href="#about">About</a>
+        <a href="#education">Education</a>
+        <a href="#posts">Posts</a>
+        <a href="#library">Documents</a>
+        <a class="btn-admin" href="admin.html">Personal Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <img id="hero-photo" class="photo" src="assets/avatar.svg" alt="Shalini Singh" />
+      <div>
+        <h1 id="hero-name">Shalini Singh</h1>
+        <div class="title" id="hero-title"></div>
+        <div class="tagline" id="hero-tagline"></div>
+        <div class="meta" id="hero-meta"></div>
+        <div class="actions" id="hero-actions"></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="section" id="about">
+      <div class="section-head"><h2>About</h2></div>
+      <div class="card about-card" id="about-body"></div>
+    </section>
+
+    <!-- CV sections rendered from content.json -->
+    <div id="sections"></div>
+
+    <section class="section" id="posts">
+      <div class="section-head"><h2>Posts</h2></div>
+      <div class="posts" id="posts-list"></div>
+    </section>
+
+    <section class="section" id="library">
+      <div class="section-head"><h2>Documents &amp; Media</h2></div>
+      <div class="library" id="library-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div>© <span id="year"></span> Shalini Singh · Advocate &amp; Legal Educator</div>
+      <div><a href="admin.html">Personal login</a></div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

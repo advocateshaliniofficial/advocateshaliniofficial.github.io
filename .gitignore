@@ -1,0 +1,4 @@
+# Never commit secrets. Tokens live only in the browser session — nothing here.
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,70 @@
+{
+  "profile": {
+    "name": "Shalini Singh",
+    "title": "Advocate · Assistant Professor of Law",
+    "tagline": "Constitutional Law · Legal Education · Patna High Court",
+    "location": "Prayagraj, Uttar Pradesh, India",
+    "email": "shalinisinghllb@gmail.com",
+    "phone": "+91-8210-960-101",
+    "photo": "assets/avatar.svg",
+    "socials": {
+      "linkedin": "",
+      "github": "https://github.com/advocateshaliniofficial",
+      "orcid": "",
+      "x": ""
+    }
+  },
+  "about": "Assistant Professor at United University, Prayagraj — Uttar Pradesh. Advocate at the Patna High Court and member of the District Bar Association, Aurangabad (Bihar). UGC-NET qualified legal educator with academic interests spanning constitutional law, jurisprudence, and criminal law.",
+  "sections": [
+    {
+      "id": "education",
+      "type": "timeline",
+      "title": "Education",
+      "items": [
+        { "heading": "B.A. LL.B (Hons)", "sub": "University of Allahabad", "meta": "2012 – 2017", "detail": "73.98%" },
+        { "heading": "LL.M (Master of Laws)", "sub": "University of Allahabad", "meta": "2017 – 2019", "detail": "84.74%" },
+        { "heading": "UGC-NET Qualified", "sub": "National Eligibility Test", "meta": "December 2024", "detail": "98.452 percentile" },
+        { "heading": "All India Bar Examination (AIBE)", "sub": "Bar Council of India", "meta": "Qualified", "detail": "" }
+      ]
+    },
+    {
+      "id": "membership",
+      "type": "list",
+      "title": "Professional Membership & Roles",
+      "items": [
+        { "heading": "Assistant Professor", "sub": "United University, Prayagraj — Uttar Pradesh", "meta": "" },
+        { "heading": "Advocate", "sub": "Patna High Court", "meta": "Enrollment No: BR/1582/2017" },
+        { "heading": "Member, District Bar Association", "sub": "Aurangabad (Bihar)", "meta": "" }
+      ]
+    },
+    {
+      "id": "interests",
+      "type": "tags",
+      "title": "Areas of Interest",
+      "items": [
+        "Constitutional Law",
+        "Law of Contract",
+        "Criminal Laws",
+        "Jurisprudence",
+        "Law of Torts",
+        "Family Law",
+        "Civil Laws"
+      ]
+    },
+    {
+      "id": "achievements",
+      "type": "bullets",
+      "title": "Other Achievements",
+      "items": [
+        "Cleared the preliminary examination of the 64th Bihar Public Service Commission.",
+        "Cleared the preliminary examination of the 31st and 32nd Bihar Judicial Examination."
+      ]
+    },
+    {
+      "id": "languages",
+      "type": "tags",
+      "title": "Languages",
+      "items": ["English", "Hindi"]
+    }
+  ]
+}
