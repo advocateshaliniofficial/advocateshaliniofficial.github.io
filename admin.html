@@ -29,6 +29,9 @@
       <p class="hint">Enter a GitHub <strong>fine-grained personal access token</strong> with <em>Contents: Read &amp; write</em> permission on this repository. It is kept only in this browser tab (session storage) and is <strong>never</strong> committed or uploaded.</p>
       <label for="tok">GitHub token</label>
       <input type="password" id="tok" placeholder="github_pat_..." autocomplete="off" />
+      <label style="display:flex;align-items:center;gap:8px;font-weight:500;margin-top:12px">
+        <input type="checkbox" id="remember" style="width:auto"> Keep me signed in on this device (paste the token once)
+      </label>
       <div style="margin-top:16px" class="row-actions">
         <button class="btn" id="login">Unlock editor</button>
         <a class="btn secondary" href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Create a token ↗</a>

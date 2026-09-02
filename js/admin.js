@@ -19,7 +19,7 @@
     return Object.assign({}, window.SITE_CONFIG, saved || {});
   }
   function setCfg(c) { localStorage.setItem("site_cfg", JSON.stringify(c)); }
-  const token = () => sessionStorage.getItem("gh_token") || "";
+  const token = () => sessionStorage.getItem("gh_token") || localStorage.getItem("gh_token") || "";
 
   // ---------- helpers ----------
   const encPath = (p) => p.split("/").map(encodeURIComponent).join("/");
@@ -123,6 +123,9 @@
     toast("Verifying…");
     try {
       await verify();
+      const remember = $("remember") && $("remember").checked;
+      if (remember) localStorage.setItem("gh_token", t);
+      else localStorage.removeItem("gh_token");
       state.content = await loadJSON("data/content.json", { profile: { socials: {} }, about: "", sections: [] });
       state.posts = await loadJSON("data/posts.json", []);
       state.media = await loadJSON("data/media.json", { items: [] });
@@ -141,6 +144,7 @@
   }
   function signout() {
     sessionStorage.removeItem("gh_token");
+    localStorage.removeItem("gh_token");
     location.reload();
   }
 
@@ -444,5 +448,8 @@
     $("login").addEventListener("click", unlock);
     $("tok").addEventListener("keydown", (e) => { if (e.key === "Enter") unlock(); });
     $("signout").addEventListener("click", (e) => { e.preventDefault(); signout(); });
+    // If a token was remembered on this device, sign in automatically.
+    const saved = localStorage.getItem("gh_token");
+    if (saved) { $("tok").value = saved; if ($("remember")) $("remember").checked = true; unlock(); }
   });
 })();
