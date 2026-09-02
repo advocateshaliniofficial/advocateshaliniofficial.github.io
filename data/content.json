@@ -38,6 +38,15 @@
       ]
     },
     {
+      "id": "certifications",
+      "type": "timeline",
+      "title": "Certifications & Professional Development",
+      "items": [
+        { "heading": "Impact of New Criminal Laws on Criminal Justice System in India", "sub": "UGC–Malaviya Mission Teacher Training Centre, University of Allahabad", "meta": "16 – 22 Jan 2026", "detail": "One-week online Faculty Development Programme · Grade A+ · Certificate No. 1076" },
+        { "heading": "Intellectual Property Rights: Transform Your Ideas into Protection", "sub": "DPIIT-IPR Chair, Dr. Ram Manohar Lohiya National Law University, Lucknow", "meta": "2 – 16 Feb 2026", "detail": "Two-credit beginners course · Grade O (Outstanding)" }
+      ]
+    },
+    {
       "id": "interests",
       "type": "tags",
       "title": "Areas of Interest",
