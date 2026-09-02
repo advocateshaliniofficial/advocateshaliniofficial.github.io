@@ -8,21 +8,45 @@
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   const bust = (url) => url + (url.includes("?") ? "&" : "?") + "t=" + Date.now();
+  const ext = (name) => (String(name).split(".").pop() || "").toUpperCase().slice(0, 4) || "DOC";
+  window.permalink = (id) => new URL("post.html?id=" + encodeURIComponent(id), location.href).href;
+  window.medialink = (id) => new URL("post.html?media=" + encodeURIComponent(id), location.href).href;
 
   async function getJSON(path, fallback) {
     try {
       const r = await fetch(bust(path), { cache: "no-store" });
       if (!r.ok) throw new Error(r.status);
       return await r.json();
-    } catch (e) {
-      console.warn("Could not load", path, e);
-      return fallback;
-    }
+    } catch (e) { console.warn("Could not load", path, e); return fallback; }
   }
 
-  function iconLink(label, url) {
-    return `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+  // ---- toast ----
+  function toast(msg, kind) {
+    let el = $("status");
+    if (!el) { el = document.createElement("div"); el.id = "status"; el.className = "status"; document.body.appendChild(el); }
+    el.textContent = msg; el.className = "status show " + (kind || "");
+    clearTimeout(toast._t); toast._t = setTimeout(() => { el.className = "status " + (kind || ""); }, 2500);
   }
+  window.copyToClip = async function (text) {
+    try { await navigator.clipboard.writeText(text); toast("Link copied — paste it on LinkedIn / Instagram.", "ok"); }
+    catch (e) { window.prompt("Copy this link:", text); }
+  };
+
+  // ---- shared: normalize + render attachments ----
+  window.postAttachments = function (p) {
+    const out = [];
+    (p.attachments || []).forEach((a) => out.push(a));
+    (p.media || []).forEach((m) => out.push({ name: String(m).split("/").pop(), path: m, type: "image" }));
+    return out;
+  };
+  window.attachmentsHTML = function (atts) {
+    if (!atts || !atts.length) return "";
+    return `<div class="attachments">` + atts.map((a) => {
+      if (a.type === "image") return `<a href="${esc(a.path)}" target="_blank" rel="noopener"><img class="att-img" src="${bust(esc(a.path))}" alt="${esc(a.name)}" loading="lazy"></a>`;
+      if (a.type === "video") return `<video class="att-video" controls preload="metadata" src="${esc(a.path)}"></video>`;
+      return `<a class="att-doc" href="${esc(a.path)}" target="_blank" rel="noopener"><span class="ic">${esc(ext(a.name))}</span><span class="nm">${esc(a.name)}</span><span class="dl">View / Download ↗</span></a>`;
+    }).join("") + `</div>`;
+  };
 
   function renderProfile(c) {
     const p = c.profile || {};
@@ -41,11 +65,10 @@
 
     const s = p.socials || {};
     const acts = [];
-    if (s.linkedin) acts.push(iconLink("LinkedIn", s.linkedin));
-    if (s.github) acts.push(iconLink("GitHub", s.github));
-    if (s.orcid) acts.push(iconLink("ORCID", s.orcid));
-    if (s.x) acts.push(iconLink("X", s.x));
-    acts.push(`<a class="chip primary" href="#posts">Read posts</a>`);
+    if (s.linkedin) acts.push(`<a class="chip" href="${esc(s.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`);
+    if (s.orcid) acts.push(`<a class="chip" href="${esc(s.orcid)}" target="_blank" rel="noopener">ORCID</a>`);
+    if (s.x) acts.push(`<a class="chip" href="${esc(s.x)}" target="_blank" rel="noopener">X</a>`);
+    acts.push(`<a class="chip primary" href="#posts">Latest posts</a>`);
     $("hero-actions").innerHTML = acts.join("");
 
     $("about-body").innerHTML = (c.about || "")
@@ -85,18 +108,19 @@
   function renderPosts(posts) {
     const list = $("posts-list");
     if (!posts || !posts.length) { list.innerHTML = '<div class="card post"><div class="empty">No posts yet.</div></div>'; return; }
-    list.innerHTML = posts.map((p) => `
-      <article class="card post">
-        <h3>${esc(p.title)}</h3>
+    list.innerHTML = posts.map((p) => {
+      const url = window.permalink(p.id);
+      return `<article class="card post" id="${esc(p.id)}">
+        <h3><a href="post.html?id=${encodeURIComponent(p.id)}">${esc(p.title || "Untitled")}</a></h3>
         <div class="date">${esc(p.date || "")}</div>
         <div class="body">${esc(p.body)}</div>
-        ${(p.media && p.media.length) ? `<div class="media">${p.media.map((m) => `<img src="${bust(esc(m))}" alt="" loading="lazy">`).join("")}</div>` : ""}
-      </article>`).join("");
-  }
-
-  function fileIcon(type, name) {
-    const ext = (name.split(".").pop() || "").toUpperCase().slice(0, 4);
-    return `<div class="icon">${esc(ext || "DOC")}</div>`;
+        ${window.attachmentsHTML(window.postAttachments(p))}
+        <div class="post-actions">
+          <a class="mini" href="post.html?id=${encodeURIComponent(p.id)}">Open post ↗</a>
+          <button class="mini copy" data-copy="${esc(url)}">🔗 Copy link to share</button>
+        </div>
+      </article>`;
+    }).join("");
   }
 
   function renderLibrary(media) {
@@ -105,21 +129,34 @@
     if (!items.length) { list.innerHTML = '<div class="empty">No documents or media uploaded yet.</div>'; return; }
     list.innerHTML = items.map((it) => {
       const t = it.type || "document";
+      const url = window.medialink(it.id);
       let preview;
       if (t === "image") preview = `<img class="thumb" src="${bust(esc(it.path))}" alt="${esc(it.name)}" loading="lazy">`;
       else if (t === "video") preview = `<video controls preload="metadata" src="${esc(it.path)}"></video>`;
-      else preview = fileIcon(t, it.name);
+      else preview = `<div class="icon">${esc(ext(it.name))}</div>`;
       return `<div class="card doc">
         ${preview}
         <div class="name">${esc(it.name)}</div>
         ${it.caption ? `<div class="cap">${esc(it.caption)}</div>` : ""}
-        <a class="open" href="${esc(it.path)}" target="_blank" rel="noopener">Open ↗</a>
+        <div class="post-actions">
+          <a class="open" href="${esc(it.path)}" target="_blank" rel="noopener">View ↗</a>
+          <button class="mini copy" data-copy="${esc(url)}">🔗 Copy link</button>
+        </div>
       </div>`;
     }).join("");
   }
 
+  function wireCopy() {
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-copy]");
+      if (b) { e.preventDefault(); window.copyToClip(b.getAttribute("data-copy")); }
+    });
+  }
+
   async function init() {
-    $("year").textContent = new Date().getFullYear();
+    const y = $("year"); if (y) y.textContent = new Date().getFullYear();
+    wireCopy();
+    if (!$("posts-list")) return; // not the index page (e.g. post.html handles itself)
     const [content, posts, media] = await Promise.all([
       getJSON("data/content.json", { profile: {}, about: "", sections: [] }),
       getJSON("data/posts.json", []),

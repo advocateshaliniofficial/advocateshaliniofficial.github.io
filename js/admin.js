@@ -36,6 +36,12 @@
     toast._t = setTimeout(() => { el.className = "status " + (kind || ""); }, kind === "err" ? 6000 : 3000);
   }
 
+  const shareURL = (kind, id) => new URL("post.html?" + kind + "=" + encodeURIComponent(id), location.href).href;
+  async function copyLink(url) {
+    try { await navigator.clipboard.writeText(url); toast("Link copied — paste it on LinkedIn / Instagram.", "ok"); }
+    catch (e) { window.prompt("Copy this link:", url); }
+  }
+
   function fileToB64(file) {
     return new Promise((res, rej) => {
       const r = new FileReader();
@@ -302,41 +308,52 @@
     const posts = state.posts || [];
     $("pane-posts").innerHTML = `
       <div class="panel">
-        <h2>Write a post</h2>
-        <label>Title</label><input type="text" id="post-title">
-        <label>Body</label><textarea id="post-body" style="min-height:120px"></textarea>
-        <label>Images (optional, you can select several)</label><input type="file" id="post-imgs" accept="image/*" multiple>
+        <h2>Create a post</h2>
+        <p class="hint">Share a note, announcement, or teaching material — attach photos, videos, or documents (PDF, slides). After publishing, use <strong>Copy share link</strong> to post it on LinkedIn or Instagram.</p>
+        <label>Title</label><input type="text" id="post-title" placeholder="e.g. New lecture notes: Fundamental Rights">
+        <label>Caption</label><textarea id="post-body" style="min-height:120px" placeholder="Write your caption here…"></textarea>
+        <label>Attachments — photos, videos, PDFs, slides (optional, select several)</label>
+        <input type="file" id="post-files" multiple>
         <div style="margin-top:14px"><button class="btn" id="publish">Publish post</button></div>
       </div>
       <div class="panel">
         <h3>Published posts</h3>
         ${posts.length ? posts.map((p, i) => `
           <div class="item-row"><div class="top">
-            <strong>${esc(p.title)}</strong>
-            <button class="btn danger" data-delpost="${i}">Delete</button>
-          </div><div class="hint">${esc(p.date || "")}</div></div>`).join("") : '<div class="empty">No posts yet.</div>'}
+            <strong>${esc(p.title || "Untitled")}</strong>
+            <div class="row-actions">
+              <button class="btn secondary" data-copypost="${esc(p.id)}">🔗 Copy share link</button>
+              <a class="btn ghost" href="${esc(shareURL("id", p.id))}" target="_blank" rel="noopener">Open ↗</a>
+              <button class="btn danger" data-delpost="${i}">Delete</button>
+            </div>
+          </div><div class="hint">${esc(p.date || "")}${(window.postAttachments ? window.postAttachments(p).length : (p.attachments || p.media || []).length) ? " · " + ((p.attachments || []).length + (p.media || []).length) + " attachment(s)" : ""}</div></div>`).join("") : '<div class="empty">No posts yet.</div>'}
       </div>`;
     $("publish").addEventListener("click", publishPost);
     $("pane-posts").querySelectorAll("[data-delpost]").forEach((b) =>
       b.addEventListener("click", () => deletePost(Number(b.getAttribute("data-delpost")))));
+    $("pane-posts").querySelectorAll("[data-copypost]").forEach((b) =>
+      b.addEventListener("click", () => copyLink(shareURL("id", b.getAttribute("data-copypost")))));
   }
   async function publishPost() {
     const title = $("post-title").value.trim();
     const body = $("post-body").value.trim();
-    if (!title && !body) return toast("Add a title or body.", "err");
-    const files = Array.from($("post-imgs").files || []);
+    const files = Array.from($("post-files").files || []);
+    if (!title && !body && !files.length) return toast("Add a title, caption, or attachment.", "err");
     try {
       toast("Publishing…");
-      const media = [];
+      const attachments = [];
       for (const f of files) {
-        const path = "uploads/" + safeName(f.name);
-        await putContent(path, await fileToB64(f), "Add post image");
-        media.push(path);
+        const type = mediaType(f);
+        const dir = type === "document" ? "docs/" : "uploads/";
+        const path = dir + safeName(f.name);
+        await putContent(path, await fileToB64(f), "Add attachment: " + f.name);
+        attachments.push({ name: f.name, path, type });
       }
-      state.posts.unshift({ id: genId("post"), title, body, date: new Date().toISOString().slice(0, 10), media });
+      const post = { id: genId("post"), title, body, date: new Date().toISOString().slice(0, 10), attachments };
+      state.posts.unshift(post);
       await putJSON("data/posts.json", state.posts, "Add post: " + (title || "untitled"));
       renderPosts();
-      toast("Post published.", "ok");
+      toast("Post published — click ‘Copy share link’ to share it.", "ok");
     } catch (e) { toast(e.message, "err"); }
   }
   async function deletePost(i) {
@@ -367,6 +384,7 @@
           <div class="item-row"><div class="top">
             <strong>${esc(it.name)} <span class="hint">(${esc(it.type)})</span></strong>
             <div class="row-actions">
+              <button class="btn secondary" data-copymedia="${esc(it.id)}">🔗 Copy share link</button>
               <a class="btn ghost" href="${esc(it.path)}" target="_blank" rel="noopener">Open ↗</a>
               <button class="btn danger" data-delmedia="${i}">Delete</button>
             </div></div>
@@ -376,6 +394,8 @@
     $("upload").addEventListener("click", uploadMedia);
     $("pane-media").querySelectorAll("[data-delmedia]").forEach((b) =>
       b.addEventListener("click", () => deleteMedia(Number(b.getAttribute("data-delmedia")))));
+    $("pane-media").querySelectorAll("[data-copymedia]").forEach((b) =>
+      b.addEventListener("click", () => copyLink(shareURL("media", b.getAttribute("data-copymedia")))));
   }
   async function uploadMedia() {
     const files = Array.from($("m-files").files || []);
