@@ -47,6 +47,7 @@
     } else {
       el.innerHTML = notFound("No post specified. <a href='index.html'>Go home</a>.");
     }
+    if (window.__reveal) window.__reveal.scan();
   }
   document.addEventListener("DOMContentLoaded", init);
 })();

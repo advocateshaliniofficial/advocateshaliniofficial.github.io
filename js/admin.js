@@ -122,32 +122,77 @@
     return j;
   }
 
-  async function unlock() {
-    const t = $("tok").value.trim();
-    if (!t) return toast("Enter a token.", "err");
-    sessionStorage.setItem("gh_token", t);
-    toast("Verifying…");
-    try {
-      await verify();
-      const remember = $("remember") && $("remember").checked;
-      if (remember) localStorage.setItem("gh_token", t);
-      else localStorage.removeItem("gh_token");
-      state.content = await loadJSON("data/content.json", { profile: { socials: {} }, about: "", sections: [] });
-      state.posts = await loadJSON("data/posts.json", []);
-      state.media = await loadJSON("data/media.json", { items: [] });
-      if (!state.content.profile) state.content.profile = { socials: {} };
-      if (!state.content.profile.socials) state.content.profile.socials = {};
-      if (!Array.isArray(state.content.sections)) state.content.sections = [];
-      $("gate").style.display = "none";
-      $("app").style.display = "block";
-      $("signout").style.display = "inline-block";
-      renderAll();
-      toast("Editor unlocked.", "ok");
-    } catch (e) {
-      sessionStorage.removeItem("gh_token");
-      toast(e.message, "err");
-    }
+  // ---- password-encrypted sign-in (no server; key encrypted with your password) ----
+  const _u8 = (b64) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  const _b64 = (buf) => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+  async function _deriveKey(password, salt) {
+    const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: 210000, hash: "SHA-256" }, km, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
   }
+  async function encryptSecret(password, secret) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await _deriveKey(password, salt);
+    const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(secret));
+    return { v: 1, alg: "PBKDF2-210k+AES-GCM", salt: _b64(salt), iv: _b64(iv), ct: _b64(ct) };
+  }
+  async function decryptSecret(password, blob) {
+    const key = await _deriveKey(password, _u8(blob.salt));
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: _u8(blob.iv) }, key, _u8(blob.ct));
+    return new TextDecoder().decode(pt);
+  }
+  async function getPublic(path, fb) {
+    try { const r = await fetch(path + "?t=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw 0; return await r.json(); }
+    catch (e) { return fb === undefined ? null : fb; }
+  }
+  const showSetup = () => { $("panel-signin").style.display = "none"; $("panel-setup").style.display = "block"; };
+  const showSignin = () => { $("panel-setup").style.display = "none"; $("panel-signin").style.display = "block"; };
+
+  async function proceed(remember) {
+    await verify();
+    if (remember) localStorage.setItem("gh_token", token()); else localStorage.removeItem("gh_token");
+    state.content = await loadJSON("data/content.json", { profile: { socials: {} }, about: "", sections: [] });
+    state.posts = await loadJSON("data/posts.json", []);
+    state.media = await loadJSON("data/media.json", { items: [] });
+    if (!state.content.profile) state.content.profile = { socials: {} };
+    if (!state.content.profile.socials) state.content.profile.socials = {};
+    if (!Array.isArray(state.content.sections)) state.content.sections = [];
+    $("gate").style.display = "none";
+    $("app").style.display = "block";
+    $("signout").style.display = "inline-block";
+    renderAll();
+  }
+
+  async function signin() {
+    const pw = $("pw").value;
+    if (!pw) return toast("Enter your password.", "err");
+    toast("Signing in…");
+    const blob = await getPublic("data/auth.enc");
+    if (!blob) { showSetup(); return toast("No sign-in set up yet — create one below.", "err"); }
+    let tok;
+    try { tok = await decryptSecret(pw, blob); }
+    catch (e) { return toast("Incorrect password.", "err"); }
+    sessionStorage.setItem("gh_token", tok);
+    try { await proceed($("remember").checked); toast("Signed in.", "ok"); }
+    catch (e) { sessionStorage.removeItem("gh_token"); toast(e.message, "err"); }
+  }
+
+  async function setup() {
+    const pw = $("su-pw").value, pw2 = $("su-pw2").value;
+    const tok = $("su-token").value.trim() || sessionStorage.getItem("gh_token") || localStorage.getItem("gh_token") || "";
+    if (pw.length < 8) return toast("Use a password of at least 8 characters.", "err");
+    if (pw !== pw2) return toast("Passwords don’t match.", "err");
+    if (!tok) return toast("Paste your GitHub access key.", "err");
+    sessionStorage.setItem("gh_token", tok);
+    toast("Checking your key…");
+    try { await verify(); } catch (e) { sessionStorage.removeItem("gh_token"); return toast(e.message, "err"); }
+    try {
+      toast("Saving your sign-in…");
+      await putJSON("data/auth.enc", await encryptSecret(pw, tok), "Set up encrypted sign-in");
+      await proceed(!$("remember") || $("remember").checked);
+      toast("All set — you’re signed in.", "ok");
+    } catch (e) { toast(e.message, "err"); }
+  }
+
   function signout() {
     sessionStorage.removeItem("gh_token");
     localStorage.removeItem("gh_token");
@@ -175,6 +220,10 @@
           <div><label>Photo</label><input type="file" id="p-photo" accept="image/*"></div>
         </div>
         <div class="grid-2">
+          <div><label>Résumé / CV (PDF) — shown as “Download CV”</label><input type="file" id="p-resume" accept="application/pdf"></div>
+          <div><label>Current résumé</label><div class="hint" id="p-resume-cur" style="margin-top:10px"></div></div>
+        </div>
+        <div class="grid-2">
           <div><label>LinkedIn URL</label><input type="url" id="p-linkedin"></div>
           <div><label>GitHub URL</label><input type="url" id="p-github"></div>
         </div>
@@ -191,7 +240,14 @@
     bind("p-linkedin", s, "linkedin"); bind("p-github", s, "github"); bind("p-orcid", s, "orcid"); bind("p-x", s, "x");
     bind("p-about", state.content, "about");
     $("p-photo").addEventListener("change", onPhoto);
+    $("p-resume").addEventListener("change", onResume);
     $("save-content").addEventListener("click", saveContent);
+    updateResumeCur();
+  }
+  function updateResumeCur() {
+    const el = $("p-resume-cur"); if (!el) return;
+    const r = state.content.profile.resume;
+    el.innerHTML = r ? `<a href="${esc(r)}" target="_blank" rel="noopener">${esc(r.split("/").pop())}</a>` : "none yet";
   }
   async function onPhoto(e) {
     const file = e.target.files[0]; if (!file) return;
@@ -202,6 +258,18 @@
       state.content.profile.photo = path;
       await saveContent(true);
       toast("Photo updated.", "ok");
+    } catch (err) { toast(err.message, "err"); }
+  }
+  async function onResume(e) {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      toast("Uploading résumé…");
+      const path = "docs/" + safeName(file.name);
+      await putContent(path, await fileToB64(file), "Update résumé PDF");
+      state.content.profile.resume = path;
+      await saveContent(true);
+      updateResumeCur();
+      toast("Résumé updated — ‘Download CV’ now points to it.", "ok");
     } catch (err) { toast(err.message, "err"); }
   }
 
@@ -463,13 +531,23 @@
       $("pane-" + t.getAttribute("data-tab")).classList.add("active");
     }));
   }
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     initTabs();
-    $("login").addEventListener("click", unlock);
-    $("tok").addEventListener("keydown", (e) => { if (e.key === "Enter") unlock(); });
+    $("signin").addEventListener("click", signin);
+    $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") signin(); });
+    $("do-setup").addEventListener("click", setup);
+    $("show-setup").addEventListener("click", showSetup);
+    $("show-signin").addEventListener("click", showSignin);
     $("signout").addEventListener("click", (e) => { e.preventDefault(); signout(); });
-    // If a token was remembered on this device, sign in automatically.
+    // Already remembered on this device? Sign in silently.
     const saved = localStorage.getItem("gh_token");
-    if (saved) { $("tok").value = saved; if ($("remember")) $("remember").checked = true; unlock(); }
+    if (saved) {
+      sessionStorage.setItem("gh_token", saved);
+      try { await proceed(true); toast("Signed in.", "ok"); return; }
+      catch (e) { localStorage.removeItem("gh_token"); sessionStorage.removeItem("gh_token"); }
+    }
+    // Otherwise show sign-in if an account exists, else first-time setup.
+    const blob = await getPublic("data/auth.enc");
+    if (blob) showSignin(); else showSetup();
   });
 })();

@@ -24,21 +24,43 @@
 
   <!-- Sign-in gate -->
   <div class="admin-wrap gate" id="gate">
-    <div class="panel">
-      <h2>Personal login</h2>
-      <p class="hint">Enter a GitHub <strong>fine-grained personal access token</strong> with <em>Contents: Read &amp; write</em> permission on this repository. It is kept only in this browser tab (session storage) and is <strong>never</strong> committed or uploaded.</p>
-      <label for="tok">GitHub token</label>
-      <input type="password" id="tok" placeholder="github_pat_..." autocomplete="off" />
+    <!-- Password sign-in -->
+    <div class="panel" id="panel-signin" style="display:none">
+      <h2>Sign in</h2>
+      <p class="hint">Enter your password to manage your page.</p>
+      <label for="pw">Password</label>
+      <input type="password" id="pw" placeholder="Your password" autocomplete="current-password" />
       <label style="display:flex;align-items:center;gap:8px;font-weight:500;margin-top:12px">
-        <input type="checkbox" id="remember" style="width:auto"> Keep me signed in on this device (paste the token once)
+        <input type="checkbox" id="remember" style="width:auto" checked /> Keep me signed in on this device
       </label>
       <div style="margin-top:16px" class="row-actions">
-        <button class="btn" id="login">Unlock editor</button>
-        <a class="btn secondary" href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Create a token ↗</a>
+        <button class="btn" id="signin">Sign in</button>
+        <button class="btn ghost" id="show-setup">First time? Set up sign-in</button>
       </div>
-      <div class="callout" style="margin-top:18px">
-        Anything you publish here goes into a <strong>public</strong> repository, so all uploaded documents and posts are publicly viewable. This login protects <em>editing</em>, not the content itself.
+    </div>
+
+    <!-- One-time setup -->
+    <div class="panel" id="panel-setup" style="display:none">
+      <h2>Set up your sign-in</h2>
+      <p class="hint">One-time setup. Pick a password you’ll use from now on and paste your GitHub access key once — the key is encrypted with your password and saved. After this, you’ll only ever need your password.</p>
+      <div class="grid-2">
+        <div><label for="su-pw">Choose a password</label><input type="password" id="su-pw" autocomplete="new-password" /></div>
+        <div><label for="su-pw2">Confirm password</label><input type="password" id="su-pw2" autocomplete="new-password" /></div>
       </div>
+      <label for="su-token">GitHub access key <span class="hint">(starts with github_pat_…)</span></label>
+      <input type="password" id="su-token" placeholder="github_pat_..." autocomplete="off" />
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn" id="do-setup">Save &amp; finish</button>
+        <a class="btn secondary" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Get a key ↗</a>
+        <button class="btn ghost" id="show-signin">Back to sign in</button>
+      </div>
+      <div class="callout" style="margin-top:16px">
+        Choose a <strong>strong</strong> password. Your key is encrypted before it’s stored, but the encrypted file sits in a public repo — a weak password could be guessed. The key only grants edit access to this one site, and you can revoke it anytime on GitHub.
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:8px">
+      Anything you publish goes into a <strong>public</strong> site — uploaded documents and posts are publicly viewable. Signing in protects <em>who can edit</em>, not who can view.
     </div>
   </div>
 

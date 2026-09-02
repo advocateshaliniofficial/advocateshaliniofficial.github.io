@@ -65,10 +65,11 @@
 
     const s = p.socials || {};
     const acts = [];
+    if (p.resume) acts.push(`<a class="chip primary" href="${esc(p.resume)}" target="_blank" rel="noopener" download>⤓ Download CV</a>`);
     if (s.linkedin) acts.push(`<a class="chip" href="${esc(s.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`);
     if (s.orcid) acts.push(`<a class="chip" href="${esc(s.orcid)}" target="_blank" rel="noopener">ORCID</a>`);
     if (s.x) acts.push(`<a class="chip" href="${esc(s.x)}" target="_blank" rel="noopener">X</a>`);
-    acts.push(`<a class="chip primary" href="#posts">Latest posts</a>`);
+    acts.push(`<a class="chip" href="#posts">Latest posts</a>`);
     $("hero-actions").innerHTML = acts.join("");
 
     $("about-body").innerHTML = (c.about || "")
@@ -166,6 +167,7 @@
     renderSections(content);
     renderPosts(posts);
     renderLibrary(media);
+    if (window.__reveal) window.__reveal.scan();
   }
 
   document.addEventListener("DOMContentLoaded", init);
